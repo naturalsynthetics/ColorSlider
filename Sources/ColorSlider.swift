@@ -27,6 +27,21 @@
 
 import UIKit
 
+class ColorSliderPanGesture: UIPanGestureRecognizer {
+    
+    var touches = Set<UITouch>()
+    
+    override init(target: Any?, action: Selector?) {
+        super.init(target: target, action: action)
+    }
+    
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent) {
+        super.touchesBegan(touches, with: event)
+        self.touches = touches
+    }
+}
+
 /// The orientation in which the `ColorSlider` is drawn.
 public enum Orientation {
 	/// The horizontal orientation.
@@ -135,11 +150,14 @@ public class ColorSlider: UIControl {
 		// Create the preview view
 		let previewView = DefaultPreviewView(side: side)
 		self.init(orientation: orientation, previewView: previewView)
+        
+        addGestureRecognizer(ColorSliderPanGesture(target: self, action: #selector(handlePan(gesture:))))
 	}
 	
 	/// - parameter orientation: The orientation of the ColorSlider.
 	/// - parameter previewView: An optional preview view that stays anchored to the slider. See ColorSliderPreviewing.
 	required public init(orientation: Orientation, previewView: PreviewView?) {
+        NSLog("hey john")
 		self.orientation = orientation
 		self.previewView = previewView
 		
@@ -154,7 +172,65 @@ public class ColorSlider: UIControl {
 			currentPreviewView.isUserInteractionEnabled = false
 			addSubview(currentPreviewView)
 		}
+        
+        addGestureRecognizer(ColorSliderPanGesture(target: self, action: #selector(handlePan(gesture:))))
 	}
+    
+    @objc func handlePan(gesture: ColorSliderPanGesture){
+        print("handlePan!")
+        guard let touch = gesture.touches.first else { return }
+        
+        switch gesture.state {
+            
+        case .possible:
+            break
+        case .began:
+            
+            internalColor.saturation = gradientView.saturation
+
+            update(touch: touch, touchInside: true)
+            
+            let touchLocation = touch.location(in: self)
+            centerPreview(at: touchLocation)
+            previewView?.transition(to: .active)
+            
+            sendActions(for: .touchDown)
+            sendActions(for: .valueChanged)
+            return
+            
+        case .changed:
+            
+            update(touch: touch, touchInside: isTouchInside)
+            
+            if isTouchInside {
+                let touchLocation = touch.location(in: self)
+                centerPreview(at: touchLocation)
+            } else {
+                previewView?.transition(to: .activeFixed)
+            }
+            
+            sendActions(for: .valueChanged)
+            
+            return
+            
+        case .ended:
+            
+            update(touch: touch, touchInside: isTouchInside)
+            
+            previewView?.transition(to: .inactive)
+            
+            sendActions(for: isTouchInside ? .touchUpInside : .touchUpOutside)
+            
+            return
+        case .cancelled:
+            sendActions(for: .touchCancel)
+            return
+        case .failed:
+            break
+        @unknown default:
+            break
+        }
+    }
 }
 
 /// :nodoc:
@@ -211,7 +287,7 @@ extension ColorSlider {
 		}
 	}
 }
-
+/*
 /// :nodoc:
 // MARK: - UIControlEvents
 extension ColorSlider {
@@ -267,7 +343,7 @@ extension ColorSlider {
 		sendActions(for: .touchCancel)
 	}
 }
-
+*/
 /// :nodoc:
 /// MARK: - Internal Calculations
 fileprivate extension ColorSlider {
