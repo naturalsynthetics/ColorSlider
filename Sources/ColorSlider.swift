@@ -157,7 +157,7 @@ public class ColorSlider: UIControl {
 	/// - parameter orientation: The orientation of the ColorSlider.
 	/// - parameter previewView: An optional preview view that stays anchored to the slider. See ColorSliderPreviewing.
 	required public init(orientation: Orientation, previewView: PreviewView?) {
-        NSLog("hey john")
+        
 		self.orientation = orientation
 		self.previewView = previewView
 		
@@ -177,7 +177,7 @@ public class ColorSlider: UIControl {
 	}
     
     @objc func handlePan(gesture: ColorSliderPanGesture){
-        print("handlePan!")
+        
         guard let touch = gesture.touches.first else { return }
         
         switch gesture.state {
