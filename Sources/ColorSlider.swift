@@ -27,16 +27,16 @@
 
 import UIKit
 
-class ColorSliderPanGesture: UIPanGestureRecognizer {
+open class ColorSliderPanGesture: UIPanGestureRecognizer {
     
     var touches = Set<UITouch>()
     
-    override init(target: Any?, action: Selector?) {
+    public override init(target: Any?, action: Selector?) {
         super.init(target: target, action: action)
     }
     
     
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent) {
+    open override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent) {
         super.touchesBegan(touches, with: event)
         self.touches = touches
     }
@@ -176,7 +176,7 @@ public class ColorSlider: UIControl {
         addGestureRecognizer(ColorSliderPanGesture(target: self, action: #selector(handlePan(gesture:))))
 	}
     
-    @objc func handlePan(gesture: ColorSliderPanGesture){
+    @objc open func handlePan(gesture: ColorSliderPanGesture){
         
         guard let touch = gesture.touches.first else { return }
         
@@ -200,14 +200,10 @@ public class ColorSlider: UIControl {
             
         case .changed:
             
-            update(touch: touch, touchInside: isTouchInside)
+            update(touch: touch, touchInside: true)
             
-            if isTouchInside {
-                let touchLocation = touch.location(in: self)
-                centerPreview(at: touchLocation)
-            } else {
-                previewView?.transition(to: .activeFixed)
-            }
+            let touchLocation = touch.location(in: self)
+            centerPreview(at: touchLocation)
             
             sendActions(for: .valueChanged)
             
