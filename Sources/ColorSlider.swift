@@ -101,7 +101,7 @@ public enum Orientation {
 /// See the `GradientView` and `HSBColor` for more details on how colors are calculated.
 ///
 
-public class ColorSlider: UIControl {
+open class ColorSlider: UIControl {
 	/// The selected color.
 	public var color: UIColor {
 		get {
@@ -232,7 +232,7 @@ public class ColorSlider: UIControl {
 /// :nodoc:
 // MARK: - Layout
 extension ColorSlider {
-	public override func layoutSubviews() {
+	open override func layoutSubviews() {
 		super.layoutSubviews()
 		
 		gradientView.frame = bounds
